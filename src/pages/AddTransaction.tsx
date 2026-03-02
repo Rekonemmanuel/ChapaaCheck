@@ -1,33 +1,43 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { addTransaction, EXPENSE_CATEGORIES, INCOME_CATEGORIES, getCategoryEmoji } from "@/lib/store";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 const AddTransaction = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [type, setType] = useState<"expense" | "income">("expense");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const categories = type === "expense" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
 
-  const handleSubmit = () => {
-    if (!amount || !category) {
+  const handleSubmit = async () => {
+    if (!amount || !category || !user) {
       toast.error("Please fill in amount and category");
       return;
     }
-    addTransaction({
-      type,
-      amount: Number(amount),
-      category,
-      description,
-      date: new Date().toISOString(),
-    });
-    toast.success(`${type === "income" ? "Income" : "Expense"} added!`);
-    navigate("/");
+    setLoading(true);
+    try {
+      await addTransaction({
+        type,
+        amount: Number(amount),
+        category,
+        description,
+        date: new Date().toISOString().split("T")[0],
+      }, user.id);
+      toast.success(`${type === "income" ? "Income" : "Expense"} added!`);
+      navigate("/");
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -102,8 +112,8 @@ const AddTransaction = () => {
         />
       </div>
 
-      <Button onClick={handleSubmit} className="w-full h-12 text-base font-semibold">
-        Add {type === "expense" ? "Expense" : "Income"}
+      <Button onClick={handleSubmit} className="w-full h-12 text-base font-semibold" disabled={loading}>
+        {loading ? "Adding..." : `Add ${type === "expense" ? "Expense" : "Income"}`}
       </Button>
     </div>
   );

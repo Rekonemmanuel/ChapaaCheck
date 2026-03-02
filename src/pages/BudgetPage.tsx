@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { getTransactions, getBudgets, saveBudgets, getSavingsGoal, setSavingsGoal, Budget, Transaction, getCategoryEmoji } from "@/lib/store";
+import { getTransactions, getBudgets, getSavingsGoal, setSavingsGoal, Budget, Transaction, getCategoryEmoji } from "@/lib/store";
+import { useAuth } from "@/contexts/AuthContext";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { PiggyBank, Pencil, Check } from "lucide-react";
 
 const BudgetPage = () => {
+  const { user } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [savingsTarget, setSavingsTarget] = useState(0);
@@ -12,10 +14,11 @@ const BudgetPage = () => {
   const [tempSavings, setTempSavings] = useState("");
 
   useEffect(() => {
-    setTransactions(getTransactions());
-    setBudgets(getBudgets());
-    setSavingsTarget(getSavingsGoal());
-  }, []);
+    if (!user) return;
+    getTransactions().then(setTransactions);
+    getBudgets(user.id).then(setBudgets);
+    getSavingsGoal(user.id).then(setSavingsTarget);
+  }, [user]);
 
   const thisMonthExpenses = transactions.filter((t) => {
     if (t.type !== "expense") return false;
@@ -38,10 +41,10 @@ const BudgetPage = () => {
   const saved = totalIncome - totalExpenses;
   const savingsPercent = savingsTarget > 0 ? Math.min(100, (saved / savingsTarget) * 100) : 0;
 
-  const handleSaveSavings = () => {
+  const handleSaveSavings = async () => {
     const val = Number(tempSavings);
-    if (val > 0) {
-      setSavingsGoal(val);
+    if (val > 0 && user) {
+      await setSavingsGoal(val, user.id);
       setSavingsTarget(val);
     }
     setEditingSavings(false);

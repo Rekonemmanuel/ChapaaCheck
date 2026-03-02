@@ -7,13 +7,17 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
-    setTransactions(getTransactions());
+    getTransactions().then(setTransactions);
   }, []);
 
-  const handleDelete = (id: string) => {
-    deleteTransaction(id);
-    setTransactions((prev) => prev.filter((t) => t.id !== id));
-    toast.success("Transaction deleted");
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteTransaction(id);
+      setTransactions((prev) => prev.filter((t) => t.id !== id));
+      toast.success("Transaction deleted");
+    } catch (err: any) {
+      toast.error(err.message);
+    }
   };
 
   const grouped = transactions.reduce<Record<string, Transaction[]>>((acc, t) => {
