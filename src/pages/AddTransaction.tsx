@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 import { addTransaction, EXPENSE_CATEGORIES, INCOME_CATEGORIES, getCategoryEmoji } from "@/lib/store";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 const AddTransaction = () => {
@@ -13,6 +18,7 @@ const AddTransaction = () => {
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
+  const [date, setDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(false);
 
   const categories = type === "expense" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
@@ -29,7 +35,7 @@ const AddTransaction = () => {
         amount: Number(amount),
         category,
         description,
-        date: new Date().toISOString().split("T")[0],
+        date: format(date, "yyyy-MM-dd"),
       }, user.id);
       toast.success(`${type === "income" ? "Income" : "Expense"} added!`);
       navigate("/");
@@ -65,9 +71,7 @@ const AddTransaction = () => {
 
       {/* Amount */}
       <div className="mb-5">
-        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-          Amount (KSh)
-        </label>
+        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Amount (KSh)</label>
         <Input
           type="number"
           placeholder="0"
@@ -77,11 +81,31 @@ const AddTransaction = () => {
         />
       </div>
 
+      {/* Date Picker */}
+      <div className="mb-5">
+        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Date</label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}>
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {format(date, "PPP")}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={(d) => d && setDate(d)}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+
       {/* Category */}
       <div className="mb-5">
-        <label className="mb-2 block text-xs font-medium text-muted-foreground">
-          Category
-        </label>
+        <label className="mb-2 block text-xs font-medium text-muted-foreground">Category</label>
         <div className="grid grid-cols-4 gap-2">
           {categories.map((cat) => (
             <button
@@ -102,14 +126,8 @@ const AddTransaction = () => {
 
       {/* Description */}
       <div className="mb-6">
-        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-          Note (optional)
-        </label>
-        <Input
-          placeholder="What was this for?"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Note (optional)</label>
+        <Input placeholder="What was this for?" value={description} onChange={(e) => setDescription(e.target.value)} />
       </div>
 
       <Button onClick={handleSubmit} className="w-full h-12 text-base font-semibold" disabled={loading}>

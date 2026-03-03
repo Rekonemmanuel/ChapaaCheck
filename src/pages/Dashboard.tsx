@@ -5,10 +5,12 @@ import BalanceCard from "@/components/BalanceCard";
 import RecentTransactions from "@/components/RecentTransactions";
 import SpendingChart from "@/components/SpendingChart";
 import SpendingTrends from "@/components/SpendingTrends";
-import { LogOut } from "lucide-react";
+import { User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
@@ -27,11 +29,11 @@ const Dashboard = () => {
           <h1 className="text-xl font-bold">ChapaaCheck</h1>
         </div>
         <button
-          onClick={signOut}
+          onClick={() => navigate("/profile")}
           className="rounded-lg p-2 text-muted-foreground hover:bg-muted transition-colors"
-          title="Sign out"
+          title="Profile"
         >
-          <LogOut className="h-4 w-4" />
+          <User className="h-5 w-5" />
         </button>
       </div>
 
