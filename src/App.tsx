@@ -9,6 +9,7 @@ import AddTransaction from "./pages/AddTransaction";
 import Transactions from "./pages/Transactions";
 import BudgetPage from "./pages/BudgetPage";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 
@@ -36,6 +37,7 @@ const AppRoutes = () => (
       <Route path="/add" element={<ProtectedRoute><AddTransaction /></ProtectedRoute>} />
       <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
       <Route path="/budget" element={<ProtectedRoute><BudgetPage /></ProtectedRoute>} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
     <BottomNav />
