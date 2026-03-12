@@ -35,26 +35,29 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const AppRoutes = () => (
-  <>
-    <Routes>
-      <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
-      <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/add" element={<ProtectedRoute><AddTransaction /></ProtectedRoute>} />
-      <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
-      <Route path="/budget" element={<ProtectedRoute><BudgetPage /></ProtectedRoute>} />
-      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
-        <Route index element={<AdminDashboard />} />
-        <Route path="users" element={<AdminUsers />} />
-        <Route path="transactions" element={<AdminTransactions />} />
-      </Route>
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-    <BottomNav />
-  </>
-);
+const AppRoutes = () => {
+  const { user } = useAuth();
+  return (
+    <>
+      <Routes>
+        <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
+        <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/add" element={<ProtectedRoute><AddTransaction /></ProtectedRoute>} />
+        <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
+        <Route path="/budget" element={<ProtectedRoute><BudgetPage /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="transactions" element={<AdminTransactions />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      {user && <BottomNav />}
+    </>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
