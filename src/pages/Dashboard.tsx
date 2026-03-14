@@ -18,13 +18,24 @@ const Dashboard = () => {
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getTransactions()
-      .then(setTransactions)
-      .finally(() => setLoading(false));
-  }, []);
+    const load = async () => {
+      try {
+        const txns = await getTransactions();
+        setTransactions(txns);
+        if (user) {
+          const b = await getBudgets(user.id);
+          setBudgets(b);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [user]);
 
   const now = new Date();
   const hour = now.getHours();
