@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { getTransactions, Transaction } from "@/lib/store";
+import { getTransactions, getBudgets, Transaction, Budget } from "@/lib/store";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/use-admin";
 import BalanceCard from "@/components/BalanceCard";
 import RecentTransactions from "@/components/RecentTransactions";
 import SpendingChart from "@/components/SpendingChart";
 import SpendingTrends from "@/components/SpendingTrends";
+import SpendingInsights from "@/components/SpendingInsights";
 import { BalanceCardSkeleton, ChartSkeleton, TransactionsSkeleton } from "@/components/DashboardSkeleton";
 import PageTransition from "@/components/PageTransition";
 import { User, ShieldCheck } from "lucide-react";
@@ -17,13 +18,24 @@ const Dashboard = () => {
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getTransactions()
-      .then(setTransactions)
-      .finally(() => setLoading(false));
-  }, []);
+    const load = async () => {
+      try {
+        const txns = await getTransactions();
+        setTransactions(txns);
+        if (user) {
+          const b = await getBudgets(user.id);
+          setBudgets(b);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [user]);
 
   const now = new Date();
   const hour = now.getHours();
@@ -72,6 +84,7 @@ const Dashboard = () => {
           ) : (
             <>
               <BalanceCard transactions={transactions} />
+              <SpendingInsights transactions={transactions} budgets={budgets} />
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
