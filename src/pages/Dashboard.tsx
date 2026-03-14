@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { getTransactions, Transaction } from "@/lib/store";
+import { getTransactions, getBudgets, Transaction, Budget } from "@/lib/store";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/use-admin";
 import BalanceCard from "@/components/BalanceCard";
 import RecentTransactions from "@/components/RecentTransactions";
 import SpendingChart from "@/components/SpendingChart";
 import SpendingTrends from "@/components/SpendingTrends";
+import SpendingInsights from "@/components/SpendingInsights";
 import { BalanceCardSkeleton, ChartSkeleton, TransactionsSkeleton } from "@/components/DashboardSkeleton";
 import PageTransition from "@/components/PageTransition";
 import { User, ShieldCheck } from "lucide-react";
