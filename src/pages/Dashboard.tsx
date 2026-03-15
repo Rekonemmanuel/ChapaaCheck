@@ -114,6 +114,13 @@ const Dashboard = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.35, duration: 0.4 }}
               >
+                <AchievementCard context={achievementCtx} />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45, duration: 0.4 }}
+              >
                 <RecentTransactions transactions={transactions} />
               </motion.div>
             </>
