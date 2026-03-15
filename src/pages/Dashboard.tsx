@@ -1,29 +1,49 @@
 import { useState, useEffect } from "react";
-import { getTransactions, Transaction } from "@/lib/store";
+import { getTransactions, getSavingsGoal, Transaction } from "@/lib/store";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/use-admin";
 import BalanceCard from "@/components/BalanceCard";
 import RecentTransactions from "@/components/RecentTransactions";
 import SpendingChart from "@/components/SpendingChart";
 import SpendingTrends from "@/components/SpendingTrends";
+import StreakBadge from "@/components/StreakBadge";
+import AchievementCard from "@/components/AchievementCard";
 import { BalanceCardSkeleton, ChartSkeleton, TransactionsSkeleton } from "@/components/DashboardSkeleton";
 import PageTransition from "@/components/PageTransition";
 import { User, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { calculateStreak, AchievementContext } from "@/lib/achievements";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [savingsGoal, setSavingsGoal] = useState(10000);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getTransactions()
-      .then(setTransactions)
+    Promise.all([
+      getTransactions(),
+      user ? getSavingsGoal(user.id) : Promise.resolve(10000),
+    ])
+      .then(([txns, goal]) => {
+        setTransactions(txns);
+        setSavingsGoal(goal);
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [user]);
+
+  const streak = calculateStreak(transactions);
+  const totalIncome = transactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+  const totalExpenses = transactions.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+  const achievementCtx: AchievementContext = {
+    transactions,
+    streak,
+    totalSaved: totalIncome - totalExpenses,
+    savingsGoal,
+  };
 
   const now = new Date();
   const hour = now.getHours();
@@ -38,9 +58,12 @@ const Dashboard = () => {
           transition={{ duration: 0.3 }}
           className="mb-5 flex items-center justify-between"
         >
-          <div>
-            <p className="text-sm text-muted-foreground">{greeting} 👋</p>
-            <h1 className="text-xl font-bold">ChapaaCheck</h1>
+          <div className="flex items-center gap-3">
+            <div>
+              <p className="text-sm text-muted-foreground">{greeting} 👋</p>
+              <h1 className="text-xl font-bold">ChapaaCheck</h1>
+            </div>
+            {!loading && <StreakBadge streak={streak} />}
           </div>
           <div className="flex items-center gap-2">
             {isAdmin && (
@@ -90,6 +113,13 @@ const Dashboard = () => {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.35, duration: 0.4 }}
+              >
+                <AchievementCard context={achievementCtx} />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45, duration: 0.4 }}
               >
                 <RecentTransactions transactions={transactions} />
               </motion.div>
