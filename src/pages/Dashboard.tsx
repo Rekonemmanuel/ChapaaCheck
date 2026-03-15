@@ -1,16 +1,19 @@
 import { useState, useEffect } from "react";
-import { getTransactions, Transaction } from "@/lib/store";
+import { getTransactions, getSavingsGoal, Transaction } from "@/lib/store";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/use-admin";
 import BalanceCard from "@/components/BalanceCard";
 import RecentTransactions from "@/components/RecentTransactions";
 import SpendingChart from "@/components/SpendingChart";
 import SpendingTrends from "@/components/SpendingTrends";
+import StreakBadge from "@/components/StreakBadge";
+import AchievementCard from "@/components/AchievementCard";
 import { BalanceCardSkeleton, ChartSkeleton, TransactionsSkeleton } from "@/components/DashboardSkeleton";
 import PageTransition from "@/components/PageTransition";
 import { User, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { calculateStreak, AchievementContext } from "@/lib/achievements";
 
 const Dashboard = () => {
   const { user } = useAuth();
