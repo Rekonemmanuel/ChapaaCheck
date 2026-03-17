@@ -39,7 +39,6 @@ const AddTransaction = () => {
         date: format(date, "yyyy-MM-dd"),
       }, user.id);
       toast.success(`${type === "income" ? "Income" : "Expense"} added! 🎉`);
-      fireConfetti();
       navigate("/");
     } catch (err: any) {
       toast.error(err.message);
