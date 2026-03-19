@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import AddTransaction from "./pages/AddTransaction";
 import Transactions from "./pages/Transactions";
 import BudgetPage from "./pages/BudgetPage";
+import RecurringTransactions from "./pages/RecurringTransactions";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
