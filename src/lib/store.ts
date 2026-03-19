@@ -101,6 +101,73 @@ export const setSavingsGoal = async (amount: number, userId: string) => {
 export const EXPENSE_CATEGORIES = ["Food", "Transport", "Entertainment", "Shopping", "Bills", "Education", "Health", "Other"];
 export const INCOME_CATEGORIES = ["Allowance", "Part-time Job", "Freelance", "Gift", "Other"];
 
+export interface RecurringTransaction {
+  id: string;
+  type: "income" | "expense";
+  amount: number;
+  category: string;
+  description: string;
+  frequency: "daily" | "weekly" | "monthly" | "yearly";
+  next_date: string;
+  is_active: boolean;
+  last_processed: string | null;
+}
+
+export const getRecurringTransactions = async (): Promise<RecurringTransaction[]> => {
+  const { data, error } = await supabase
+    .from("recurring_transactions")
+    .select("*")
+    .order("next_date", { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    id: r.id,
+    type: r.type as "income" | "expense",
+    amount: Number(r.amount),
+    category: r.category,
+    description: r.description ?? "",
+    frequency: r.frequency as RecurringTransaction["frequency"],
+    next_date: r.next_date,
+    is_active: r.is_active,
+    last_processed: r.last_processed,
+  }));
+};
+
+export const addRecurringTransaction = async (
+  t: Omit<RecurringTransaction, "id" | "is_active" | "last_processed">,
+  userId: string
+): Promise<RecurringTransaction> => {
+  const { data, error } = await supabase
+    .from("recurring_transactions")
+    .insert({ ...t, user_id: userId })
+    .select()
+    .single();
+  if (error) throw error;
+  return {
+    id: data.id,
+    type: data.type as "income" | "expense",
+    amount: Number(data.amount),
+    category: data.category,
+    description: (data as any).description ?? "",
+    frequency: data.frequency as RecurringTransaction["frequency"],
+    next_date: data.next_date,
+    is_active: data.is_active,
+    last_processed: data.last_processed,
+  };
+};
+
+export const updateRecurringTransaction = async (id: string, updates: Partial<RecurringTransaction>) => {
+  const { error } = await supabase
+    .from("recurring_transactions")
+    .update(updates)
+    .eq("id", id);
+  if (error) throw error;
+};
+
+export const deleteRecurringTransaction = async (id: string) => {
+  const { error } = await supabase.from("recurring_transactions").delete().eq("id", id);
+  if (error) throw error;
+};
+
 export const getCategoryEmoji = (cat: string): string => {
   const map: Record<string, string> = {
     Food: "🍔", Transport: "🚌", Entertainment: "🎮", Shopping: "🛍️",
