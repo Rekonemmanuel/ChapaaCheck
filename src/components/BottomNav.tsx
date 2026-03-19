@@ -8,14 +8,6 @@ const tabs = [
   { path: "/recurring", icon: Repeat, label: "Recurring" },
   { path: "/budget", icon: Target, label: "Budget" },
 ];
-import { useLocation, useNavigate } from "react-router-dom";
-
-const tabs = [
-  { path: "/", icon: Home, label: "Home" },
-  { path: "/add", icon: PlusCircle, label: "Add" },
-  { path: "/transactions", icon: List, label: "History" },
-  { path: "/budget", icon: Target, label: "Budget" },
-];
 
 const BottomNav = () => {
   const location = useLocation();
