@@ -60,7 +60,7 @@ const AppRoutes = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AnimatePresence>
-      {user && <BottomNav />}
+      {user && !location.pathname.startsWith("/admin") && <BottomNav />}
     </>
   );
 };
