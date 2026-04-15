@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { getTransactions, getSavingsGoal, Transaction } from "@/lib/store";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAdmin } from "@/hooks/use-admin";
 import BalanceCard from "@/components/BalanceCard";
 import RecentTransactions from "@/components/RecentTransactions";
 import SpendingChart from "@/components/SpendingChart";
@@ -10,14 +9,13 @@ import StreakBadge from "@/components/StreakBadge";
 import AchievementCard from "@/components/AchievementCard";
 import { BalanceCardSkeleton, ChartSkeleton, TransactionsSkeleton } from "@/components/DashboardSkeleton";
 import PageTransition from "@/components/PageTransition";
-import { User, ShieldCheck } from "lucide-react";
+import { User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { calculateStreak, AchievementContext } from "@/lib/achievements";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [savingsGoal, setSavingsGoal] = useState(10000);
@@ -66,15 +64,6 @@ const Dashboard = () => {
             {!loading && <StreakBadge streak={streak} />}
           </div>
           <div className="flex items-center gap-2">
-            {isAdmin && (
-              <button
-                onClick={() => navigate("/admin")}
-                className="rounded-lg p-2 text-primary hover:bg-muted transition-colors"
-                title="Admin Dashboard"
-              >
-                <ShieldCheck className="h-5 w-5" />
-              </button>
-            )}
             <button
               onClick={() => navigate("/profile")}
               className="rounded-lg p-2 text-muted-foreground hover:bg-muted transition-colors"
