@@ -104,3 +104,17 @@
     font-family: 'Space Grotesk', system-ui, sans-serif;
   }
 }
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  nav, button, .no-print {
+    display: none !important;
+  }
+  .print-report {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+}

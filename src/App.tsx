@@ -14,6 +14,7 @@ import RecurringTransactions from "./pages/RecurringTransactions";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
+import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -51,6 +52,7 @@ const AppRoutes = () => {
           <Route path="/budget" element={<ProtectedRoute><BudgetPage /></ProtectedRoute>} />
           <Route path="/recurring" element={<ProtectedRoute><RecurringTransactions /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboard />} />

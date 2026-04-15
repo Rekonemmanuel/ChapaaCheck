@@ -1,4 +1,4 @@
-import { Home, PlusCircle, List, Target, Repeat } from "lucide-react";
+import { Home, PlusCircle, List, Target, Repeat, FileText } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const tabs = [
@@ -7,6 +7,7 @@ const tabs = [
   { path: "/transactions", icon: List, label: "History" },
   { path: "/recurring", icon: Repeat, label: "Recurring" },
   { path: "/budget", icon: Target, label: "Budget" },
+  { path: "/reports", icon: FileText, label: "Reports" },
 ];
 
 const BottomNav = () => {
