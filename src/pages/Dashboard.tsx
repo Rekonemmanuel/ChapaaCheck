@@ -16,7 +16,6 @@ import { calculateStreak, AchievementContext } from "@/lib/achievements";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [savingsGoal, setSavingsGoal] = useState(10000);
