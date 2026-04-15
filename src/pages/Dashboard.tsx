@@ -66,15 +66,6 @@ const Dashboard = () => {
             {!loading && <StreakBadge streak={streak} />}
           </div>
           <div className="flex items-center gap-2">
-            {isAdmin && (
-              <button
-                onClick={() => navigate("/admin")}
-                className="rounded-lg p-2 text-primary hover:bg-muted transition-colors"
-                title="Admin Dashboard"
-              >
-                <ShieldCheck className="h-5 w-5" />
-              </button>
-            )}
             <button
               onClick={() => navigate("/profile")}
               className="rounded-lg p-2 text-muted-foreground hover:bg-muted transition-colors"
