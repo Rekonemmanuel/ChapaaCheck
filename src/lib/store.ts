@@ -98,6 +98,70 @@ export const setSavingsGoal = async (amount: number, userId: string) => {
     .upsert({ amount, user_id: userId }, { onConflict: "user_id" });
 };
 
+export interface SavingsJar {
+  id: string;
+  name: string;
+  emoji: string;
+  target_amount: number;
+  saved_amount: number;
+  color: string;
+}
+
+export const JAR_COLORS = ["emerald", "amber", "sky", "rose", "violet", "orange", "teal", "yellow"] as const;
+
+export const getSavingsJars = async (): Promise<SavingsJar[]> => {
+  const { data, error } = await supabase
+    .from("savings_jars")
+    .select("*")
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map((j: any) => ({
+    id: j.id,
+    name: j.name,
+    emoji: j.emoji,
+    target_amount: Number(j.target_amount),
+    saved_amount: Number(j.saved_amount),
+    color: j.color,
+  }));
+};
+
+export const addSavingsJar = async (
+  jar: Omit<SavingsJar, "id" | "saved_amount"> & { saved_amount?: number },
+  userId: string
+): Promise<SavingsJar> => {
+  const { data, error } = await supabase
+    .from("savings_jars")
+    .insert({
+      name: jar.name,
+      emoji: jar.emoji,
+      target_amount: jar.target_amount,
+      saved_amount: jar.saved_amount ?? 0,
+      color: jar.color,
+      user_id: userId,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return {
+    id: data.id,
+    name: data.name,
+    emoji: data.emoji,
+    target_amount: Number(data.target_amount),
+    saved_amount: Number(data.saved_amount),
+    color: data.color,
+  };
+};
+
+export const updateSavingsJar = async (id: string, updates: Partial<Omit<SavingsJar, "id">>) => {
+  const { error } = await supabase.from("savings_jars").update(updates).eq("id", id);
+  if (error) throw error;
+};
+
+export const deleteSavingsJar = async (id: string) => {
+  const { error } = await supabase.from("savings_jars").delete().eq("id", id);
+  if (error) throw error;
+};
+
 export const EXPENSE_CATEGORIES = ["Food", "Transport", "Entertainment", "Shopping", "Bills", "Education", "Health", "Other"];
 export const INCOME_CATEGORIES = ["Allowance", "Part-time Job", "Freelance", "Gift", "Other"];
 
