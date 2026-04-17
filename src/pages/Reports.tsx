@@ -268,7 +268,9 @@ const Reports = () => {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const reportRef = useRef<HTMLDivElement>(null);
+  const page1Ref = useRef<HTMLDivElement>(null);
+  const page2Ref = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     getTransactions()
@@ -276,10 +278,8 @@ const Reports = () => {
       .finally(() => setLoading(false));
   }, [user]);
 
-  const [downloading, setDownloading] = useState(false);
-
   const handleDownloadPDF = async () => {
-    if (!reportRef.current) return;
+    if (!page1Ref.current || !page2Ref.current) return;
     setDownloading(true);
     try {
       const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
@@ -287,32 +287,35 @@ const Reports = () => {
         import("jspdf"),
       ]);
 
-      const element = reportRef.current;
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        backgroundColor: getComputedStyle(document.body).backgroundColor || "#ffffff",
-        useCORS: true,
-      });
-
-      const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const margin = 10;
+      const contentWidth = pageWidth - margin * 2;
+      const contentHeight = pageHeight - margin * 2;
 
-      let heightLeft = imgHeight;
-      let position = 0;
+      const renderPage = async (el: HTMLElement, isFirst: boolean) => {
+        const canvas = await html2canvas(el, {
+          scale: 2,
+          backgroundColor: "#ffffff",
+          useCORS: true,
+        });
+        const imgData = canvas.toDataURL("image/png");
+        const ratio = canvas.width / canvas.height;
+        let imgWidth = contentWidth;
+        let imgHeight = imgWidth / ratio;
+        if (imgHeight > contentHeight) {
+          imgHeight = contentHeight;
+          imgWidth = imgHeight * ratio;
+        }
+        const x = (pageWidth - imgWidth) / 2;
+        const y = margin;
+        if (!isFirst) pdf.addPage();
+        pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
+      };
 
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
+      await renderPage(page1Ref.current, true);
+      await renderPage(page2Ref.current, false);
 
       pdf.save(`ChapaaCheck-Report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
     } catch (err) {
@@ -356,16 +359,35 @@ const Reports = () => {
           </Button>
         </motion.div>
 
-        <div ref={reportRef} className="space-y-5 print-report">
+        {/* Page 1 */}
+        <div ref={page1Ref} className="space-y-4 rounded-2xl border border-border/50 bg-background p-4">
           <Letterhead />
           <SummaryCards transactions={transactions} />
           <MonthlyComparisonChart transactions={transactions} />
           <CategoryBreakdownChart transactions={transactions} />
+        </div>
+
+        {/* Page divider */}
+        <div className="my-5 flex items-center gap-2">
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Page 2</span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+
+        {/* Page 2 */}
+        <div ref={page2Ref} className="space-y-4 rounded-2xl border border-border/50 bg-background p-4">
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
+                C
+              </div>
+              <p className="text-xs font-semibold">ChapaaCheck — Detailed Insights</p>
+            </div>
+            <p className="text-[10px] text-muted-foreground">Page 2 of 2</p>
+          </div>
           <IncomeExpenseTrendChart transactions={transactions} />
           <TopSpendingTable transactions={transactions} />
-
-          {/* Print-only footer */}
-          <div className="hidden print:block mt-8 border-t border-border pt-4 text-center">
+          <div className="mt-4 border-t border-border pt-3 text-center">
             <p className="text-[10px] text-muted-foreground">
               ChapaaCheck — Your Personal Finance Companion • {format(new Date(), "dd MMMM yyyy")}
             </p>

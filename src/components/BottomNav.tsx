@@ -1,11 +1,10 @@
-import { Home, PlusCircle, List, Target, Repeat, FileText } from "lucide-react";
+import { Home, PlusCircle, List, Target, FileText } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const tabs = [
   { path: "/", icon: Home, label: "Home" },
   { path: "/add", icon: PlusCircle, label: "Add" },
   { path: "/transactions", icon: List, label: "History" },
-  { path: "/recurring", icon: Repeat, label: "Recurring" },
   { path: "/budget", icon: Target, label: "Budget" },
   { path: "/reports", icon: FileText, label: "Reports" },
 ];
