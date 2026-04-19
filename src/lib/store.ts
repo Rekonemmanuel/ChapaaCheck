@@ -83,6 +83,22 @@ export const saveBudgets = async (budgets: Budget[], userId: string) => {
   }
 };
 
+export const upsertBudget = async (budget: Budget, userId: string) => {
+  const { error } = await supabase
+    .from("budgets")
+    .upsert({ category: budget.category, limit: budget.limit, user_id: userId }, { onConflict: "user_id,category" });
+  if (error) throw error;
+};
+
+export const deleteBudget = async (category: string, userId: string) => {
+  const { error } = await supabase
+    .from("budgets")
+    .delete()
+    .eq("user_id", userId)
+    .eq("category", category);
+  if (error) throw error;
+};
+
 export const getSavingsGoal = async (userId: string): Promise<number> => {
   const { data } = await supabase
     .from("savings_goals")
