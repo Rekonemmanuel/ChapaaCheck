@@ -53,7 +53,10 @@ const Auth = () => {
             className="mb-3 h-14 w-14 rounded-2xl object-contain shadow-sm"
           />
           <h1 className="text-3xl font-bold">ChapaaCheck</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-0.5 text-xs font-medium text-primary">
+            Smart Student Finance Tracker
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
             {isLogin ? "Welcome back! 👋" : "Create your account 🎉"}
           </p>
         </div>

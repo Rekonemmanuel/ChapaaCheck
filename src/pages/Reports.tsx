@@ -385,7 +385,7 @@ const Reports = () => {
           <TopSpendingTable transactions={transactions} />
           <div className="mt-4 border-t border-border pt-3 text-center">
             <p className="text-[10px] text-muted-foreground">
-              ChapaaCheck — Your Personal Finance Companion • {format(new Date(), "dd MMMM yyyy")}
+              ChapaaCheck — Smart Student Finance Tracker • {format(new Date(), "dd MMMM yyyy")}
             </p>
           </div>
         </div>
