@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
-import logo from "@/assets/chapaacheck-logo.png";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -47,14 +46,7 @@ const Auth = () => {
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm animate-fade-in">
-        <div className="mb-8 flex flex-col items-center text-center">
-          <img
-            src={logo}
-            alt="ChapaaCheck logo"
-            width={80}
-            height={80}
-            className="mb-3 h-20 w-20 drop-shadow-md"
-          />
+        <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold">ChapaaCheck</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {isLogin ? "Welcome back! 👋" : "Create your account 🎉"}
