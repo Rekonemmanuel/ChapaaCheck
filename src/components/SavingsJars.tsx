@@ -4,6 +4,8 @@ import {
   addSavingsJar,
   updateSavingsJar,
   deleteSavingsJar,
+  getAvailableToSave,
+  addTransaction,
   SavingsJar,
   JAR_COLORS,
 } from "@/lib/store";
@@ -79,16 +81,43 @@ const SavingsJars = () => {
   };
 
   const handleContribute = async (delta: number) => {
-    if (!contributeJar) return;
+    if (!contributeJar || !user) return;
     const amt = Number(contributeAmount);
     if (!amt || amt <= 0) { toast.error("Enter a valid amount"); return; }
+
+    if (delta > 0) {
+      // Deposit: must have available (unallocated) income to cover it
+      const available = await getAvailableToSave(user.id);
+      if (amt > available) {
+        toast.error(`Not enough income. You only have KSh ${available.toLocaleString()} available to save.`);
+        return;
+      }
+    } else {
+      // Withdraw: can't take more than is in the jar
+      if (amt > contributeJar.saved_amount) {
+        toast.error("You can't withdraw more than the jar holds");
+        return;
+      }
+    }
+
     const newSaved = Math.max(0, contributeJar.saved_amount + delta * amt);
     try {
       await updateSavingsJar(contributeJar.id, { saved_amount: newSaved });
+      // Mirror the move in the transactions ledger so balance stays accurate
+      await addTransaction(
+        {
+          type: delta > 0 ? "expense" : "income",
+          amount: amt,
+          category: "Savings",
+          description: `${delta > 0 ? "Deposit to" : "Withdraw from"} ${contributeJar.emoji} ${contributeJar.name}`,
+          date: new Date().toISOString().slice(0, 10),
+        },
+        user.id
+      );
       setJars((prev) => prev.map((j) => (j.id === contributeJar.id ? { ...j, saved_amount: newSaved } : j)));
       setContributeJar(null);
       setContributeAmount("");
-      toast.success(delta > 0 ? "Added to jar 💰" : "Withdrawn from jar");
+      toast.success(delta > 0 ? "Saved to jar 💰" : "Withdrawn from jar");
     } catch (err: any) {
       toast.error(err.message);
     }
