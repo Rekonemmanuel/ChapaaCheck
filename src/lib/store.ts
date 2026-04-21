@@ -137,6 +137,18 @@ export interface SavingsJar {
   color: string;
 }
 
+// Available balance = income - expenses - already saved in jars
+export const getAvailableToSave = async (userId: string): Promise<number> => {
+  const [{ data: txs }, { data: jars }] = await Promise.all([
+    supabase.from("transactions").select("type, amount").eq("user_id", userId).is("deleted_at", null),
+    supabase.from("savings_jars").select("saved_amount").eq("user_id", userId).is("deleted_at", null),
+  ]);
+  const income = (txs ?? []).filter((t: any) => t.type === "income").reduce((s, t: any) => s + Number(t.amount), 0);
+  const expense = (txs ?? []).filter((t: any) => t.type === "expense").reduce((s, t: any) => s + Number(t.amount), 0);
+  // expenses already include any "Savings" auto-logged ones, which mirror jar deposits
+  return income - expense;
+};
+
 export const JAR_COLORS = ["emerald", "amber", "sky", "rose", "violet", "orange", "teal", "yellow"] as const;
 
 export const getSavingsJars = async (): Promise<SavingsJar[]> => {
@@ -197,8 +209,8 @@ export const deleteSavingsJar = async (id: string) => {
 };
 
 // ---------- Categories ----------
-export const EXPENSE_CATEGORIES = ["Food", "Transport", "Entertainment", "Shopping", "Bills", "Education", "Health", "Other"];
-export const INCOME_CATEGORIES = ["Allowance", "Part-time Job", "Freelance", "Gift", "Other"];
+export const EXPENSE_CATEGORIES = ["Food", "Transport", "Entertainment", "Shopping", "Bills", "Education", "Health", "Savings", "Other"];
+export const INCOME_CATEGORIES = ["Allowance", "Part-time Job", "Freelance", "Gift", "Savings", "Other"];
 
 // ---------- Recurring ----------
 export interface RecurringTransaction {
@@ -384,7 +396,7 @@ export const daysUntilPurge = (deleted_at: string) => Math.max(0, 7 - daysAgo(de
 export const getCategoryEmoji = (cat: string): string => {
   const map: Record<string, string> = {
     Food: "🍔", Transport: "🚌", Entertainment: "🎮", Shopping: "🛍️",
-    Bills: "💡", Education: "📚", Health: "💊", Other: "📦",
+    Bills: "💡", Education: "📚", Health: "💊", Savings: "🏦", Other: "📦",
     Allowance: "💰", "Part-time Job": "💼", Freelance: "💻", Gift: "🎁",
   };
   return map[cat] || "📦";
