@@ -6,11 +6,10 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ArrowLeft, User, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import ThemeToggle from "@/components/ThemeToggle";
 import { useAdmin } from "@/hooks/use-admin";
 
 const Profile = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { isAdmin } = useAdmin();
   const [displayName, setDisplayName] = useState("");
@@ -79,23 +78,12 @@ const Profile = () => {
           </Button>
         </div>
 
-        <div className="rounded-2xl bg-card p-5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Theme</span>
-            <ThemeToggle />
-          </div>
-        </div>
-
         {isAdmin && (
           <Button variant="outline" onClick={() => navigate("/admin")} className="w-full gap-2">
             <Shield className="h-4 w-4" />
             Admin Dashboard
           </Button>
         )}
-
-        <Button variant="outline" onClick={signOut} className="w-full text-destructive hover:text-destructive">
-          Sign Out
-        </Button>
       </div>
     </div>
   );
