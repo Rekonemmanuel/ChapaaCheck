@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import PageTransition from "@/components/PageTransition";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const FREQUENCIES = [
   { value: "daily", label: "Daily" },
@@ -45,6 +46,7 @@ const RecurringTransactions = () => {
   const [frequency, setFrequency] = useState<RecurringTransaction["frequency"]>("monthly");
   const [nextDate, setNextDate] = useState<Date>(new Date());
   const [submitting, setSubmitting] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<RecurringTransaction | null>(null);
 
   const categories = type === "expense" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
 
@@ -96,13 +98,16 @@ const RecurringTransactions = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await deleteRecurringTransaction(id);
-      setItems((prev) => prev.filter((i) => i.id !== id));
-      toast.success("Deleted");
+      await deleteRecurringTransaction(deleteTarget.id);
+      setItems((prev) => prev.filter((i) => i.id !== deleteTarget.id));
+      toast.success("Moved to Bin");
     } catch (err: any) {
       toast.error(err.message);
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
@@ -249,7 +254,7 @@ const RecurringTransactions = () => {
                   {item.type === "income" ? "+" : "-"}KSh {item.amount.toLocaleString()}
                 </span>
                 <Switch checked={item.is_active} onCheckedChange={() => handleToggle(item.id, item.is_active)} />
-                <button onClick={() => handleDelete(item.id)} className="rounded-lg p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors">
+                <button onClick={() => setDeleteTarget(item)} className="rounded-lg p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
@@ -257,6 +262,15 @@ const RecurringTransactions = () => {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(o) => !o && setDeleteTarget(null)}
+        title="Delete this recurring transaction?"
+        description={`"${deleteTarget?.description || deleteTarget?.category}" will be moved to the Bin and auto-deleted after 7 days.`}
+        confirmLabel="Move to Bin"
+        onConfirm={handleDelete}
+      />
     </PageTransition>
   );
 };
