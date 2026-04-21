@@ -21,6 +21,7 @@ import {
 import { PiggyBank, Plus, Trash2, Minus } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const SUGGESTED_EMOJIS = ["🎯", "💻", "🚗", "🏠", "✈️", "📱", "🎓", "💍", "🎮", "📚", "🚲", "🎸", "🆘", "🎁"];
 
@@ -42,6 +43,7 @@ const SavingsJars = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [contributeJar, setContributeJar] = useState<SavingsJar | null>(null);
   const [contributeAmount, setContributeAmount] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<SavingsJar | null>(null);
 
   // New jar form
   const [name, setName] = useState("");
@@ -92,13 +94,16 @@ const SavingsJars = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await deleteSavingsJar(id);
-      setJars((prev) => prev.filter((j) => j.id !== id));
-      toast.success("Jar removed");
+      await deleteSavingsJar(deleteTarget.id);
+      setJars((prev) => prev.filter((j) => j.id !== deleteTarget.id));
+      toast.success("Jar moved to Bin");
     } catch (err: any) {
       toast.error(err.message);
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
@@ -198,7 +203,7 @@ const SavingsJars = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => handleDelete(jar.id)}
+                    onClick={() => setDeleteTarget(jar)}
                     className="rounded-lg p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -255,6 +260,15 @@ const SavingsJars = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(o) => !o && setDeleteTarget(null)}
+        title="Delete this jar?"
+        description={`"${deleteTarget?.name}" will be moved to the Bin. Your saved amount stays with the jar and can be restored within 7 days.`}
+        confirmLabel="Move to Bin"
+        onConfirm={handleDelete}
+      />
     </div>
   );
 };

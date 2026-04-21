@@ -9,7 +9,7 @@ import StreakBadge from "@/components/StreakBadge";
 import AchievementCard from "@/components/AchievementCard";
 import { BalanceCardSkeleton, ChartSkeleton, TransactionsSkeleton } from "@/components/DashboardSkeleton";
 import PageTransition from "@/components/PageTransition";
-import { User } from "lucide-react";
+import { Settings as SettingsIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { calculateStreak, AchievementContext } from "@/lib/achievements";
@@ -65,11 +65,12 @@ const Dashboard = () => {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => navigate("/profile")}
+              onClick={() => navigate("/settings")}
               className="rounded-lg p-2 text-muted-foreground hover:bg-muted transition-colors"
-              title="Profile"
+              title="Settings"
+              aria-label="Settings"
             >
-              <User className="h-5 w-5" />
+              <SettingsIcon className="h-5 w-5" />
             </button>
           </div>
         </motion.div>

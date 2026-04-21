@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          deleted_at: string | null
           id: string
           limit: number
           updated_at: string
@@ -26,6 +27,7 @@ export type Database = {
         Insert: {
           category: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           limit: number
           updated_at?: string
@@ -34,6 +36,7 @@ export type Database = {
         Update: {
           category?: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           limit?: number
           updated_at?: string
@@ -73,6 +76,7 @@ export type Database = {
           amount: number
           category: string
           created_at: string
+          deleted_at: string | null
           description: string
           frequency: string
           id: string
@@ -87,6 +91,7 @@ export type Database = {
           amount: number
           category: string
           created_at?: string
+          deleted_at?: string | null
           description?: string
           frequency?: string
           id?: string
@@ -101,6 +106,7 @@ export type Database = {
           amount?: number
           category?: string
           created_at?: string
+          deleted_at?: string | null
           description?: string
           frequency?: string
           id?: string
@@ -138,6 +144,7 @@ export type Database = {
         Row: {
           color: string
           created_at: string
+          deleted_at: string | null
           emoji: string
           id: string
           name: string
@@ -149,6 +156,7 @@ export type Database = {
         Insert: {
           color?: string
           created_at?: string
+          deleted_at?: string | null
           emoji?: string
           id?: string
           name: string
@@ -160,6 +168,7 @@ export type Database = {
         Update: {
           color?: string
           created_at?: string
+          deleted_at?: string | null
           emoji?: string
           id?: string
           name?: string
@@ -176,6 +185,7 @@ export type Database = {
           category: string
           created_at: string
           date: string
+          deleted_at: string | null
           description: string
           id: string
           type: string
@@ -186,6 +196,7 @@ export type Database = {
           category: string
           created_at?: string
           date?: string
+          deleted_at?: string | null
           description?: string
           id?: string
           type: string
@@ -196,6 +207,7 @@ export type Database = {
           category?: string
           created_at?: string
           date?: string
+          deleted_at?: string | null
           description?: string
           id?: string
           type?: string
@@ -236,6 +248,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      purge_old_bin_items: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

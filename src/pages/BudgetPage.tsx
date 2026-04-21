@@ -131,7 +131,7 @@ const BudgetPage = () => {
     try {
       await deleteBudget(deleteTarget.category, user.id);
       setBudgets((prev) => prev.filter((b) => b.category !== deleteTarget.category));
-      toast.success("Budget deleted");
+      toast.success("Budget moved to Bin");
     } catch (e: any) {
       toast.error(e.message ?? "Could not delete budget");
     } finally {
@@ -270,7 +270,7 @@ const BudgetPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete budget?</AlertDialogTitle>
             <AlertDialogDescription>
-              This removes the {deleteTarget?.category} budget. Your transactions are not affected.
+              The {deleteTarget?.category} budget will be moved to the Bin and auto-deleted after 7 days. Your transactions are not affected.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

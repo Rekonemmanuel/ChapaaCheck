@@ -3,6 +3,7 @@ import { getTransactions, deleteTransaction, Transaction, getCategoryEmoji, EXPE
 import { Trash2, Search, Download, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const ALL_CATEGORIES = [...new Set([...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES])];
 
@@ -11,6 +12,7 @@ const Transactions = () => {
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterType, setFilterType] = useState<"" | "income" | "expense">("");
+  const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
 
   useEffect(() => {
     getTransactions().then(setTransactions);
@@ -25,13 +27,16 @@ const Transactions = () => {
     });
   }, [transactions, search, filterCategory, filterType]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await deleteTransaction(id);
-      setTransactions((prev) => prev.filter((t) => t.id !== id));
-      toast.success("Transaction deleted");
+      await deleteTransaction(deleteTarget.id);
+      setTransactions((prev) => prev.filter((t) => t.id !== deleteTarget.id));
+      toast.success("Moved to Bin");
     } catch (err: any) {
       toast.error(err.message);
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
@@ -140,7 +145,7 @@ const Transactions = () => {
                       {t.type === "income" ? "+" : "-"}KSh {t.amount.toLocaleString()}
                     </span>
                     <button
-                      onClick={() => handleDelete(t.id)}
+                      onClick={() => setDeleteTarget(t)}
                       className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -152,6 +157,15 @@ const Transactions = () => {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(o) => !o && setDeleteTarget(null)}
+        title="Delete this transaction?"
+        description={`"${deleteTarget?.description || deleteTarget?.category}" will be moved to the Bin and auto-deleted after 7 days.`}
+        confirmLabel="Move to Bin"
+        onConfirm={handleDelete}
+      />
     </div>
   );
 };
