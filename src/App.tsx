@@ -23,7 +23,6 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminTransactions from "./pages/admin/AdminTransactions";
-import AdminBin from "./pages/admin/AdminBin";
 
 const queryClient = new QueryClient();
 
@@ -63,7 +62,6 @@ const AppRoutes = () => {
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="transactions" element={<AdminTransactions />} />
-            <Route path="bin" element={<AdminBin />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
